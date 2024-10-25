@@ -52,7 +52,7 @@ class PuestosTrabajoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
     }
 
     /**
@@ -74,9 +74,38 @@ class PuestosTrabajoController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request,  $id)
     {
-        //
+        $puesto = PuestosTrabajo::find($id);
+
+        if (!$puesto) {
+            return response()->json([
+                'message' => 'Puesto de trabajo no encontrado'
+            ], 404);
+        }
+
+
+        $validator = Validator::make($request->all(), [
+            'nombre' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Error de validación',
+                'errors' => $validator->errors()
+            ], 400);
+        }
+
+        $registro = $puesto->update([
+            'nombre' => $request->nombre,
+        ]);
+
+        return response()->json([
+            'message' => 'Puesto de trabajo actualizado',
+            'data' => $registro
+        ]);
+
+
     }
 
     /**

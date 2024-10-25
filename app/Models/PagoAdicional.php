@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Institucion extends Model
+class PagoAdicional extends Model
 {
     use HasFactory;
     // Nombre de la tabla
-    protected $table = 'instituciones';
+    protected $table = 'pago_adicional';
 
     // Clave primaria de la tabla
     protected $primaryKey = 'id';
@@ -22,17 +22,20 @@ class Institucion extends Model
 
     // Campos que se pueden asignar de forma masiva
     protected $fillable = [
-        'codigo',
-        'nombre'
+        'periodo',
+        'cantidad_hora_diurna',
+        'monto_hora_diurna',
+        'cantidad_hora_nocturna',
+        'monto_hora_nocturna',
+        'vacaciones',
+        'aguinaldo',
+        'empleado_id',
+        'indemnizacion'
     ];
 
-    public $hidden = [
-        'created_at',
-        'updated_at',
-    ];
-
-    public function empleados()
+  
+    public function empleado()
     {
-        return $this->hasMany(Empleados::class, 'institucion_id');
+        return $this->belongsTo(Empleados::class, 'empleado_id');
     }
 }

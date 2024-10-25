@@ -30,4 +30,9 @@ class PuestosTrabajo extends Model
           'updated_at',
       ];
 
+        public function empleados()
+        {
+            return $this->hasMany(Empleados::class, 'puesto_trabajo_id');
+        }
+
 }

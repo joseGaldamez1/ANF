@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Institucion extends Model
+class Empleador extends Model
 {
     use HasFactory;
     // Nombre de la tabla
-    protected $table = 'instituciones';
-
+    protected $table = 'empleador';
+    
     // Clave primaria de la tabla
     protected $primaryKey = 'id';
 
@@ -22,8 +22,10 @@ class Institucion extends Model
 
     // Campos que se pueden asignar de forma masiva
     protected $fillable = [
-        'codigo',
-        'nombre'
+        'tipo_documento_id',
+        'numero_documento',
+        'numero_patronal',
+        'centro_trabajo',
     ];
 
     public $hidden = [
@@ -31,8 +33,8 @@ class Institucion extends Model
         'updated_at',
     ];
 
-    public function empleados()
+    public function tipoDocumento()
     {
-        return $this->hasMany(Empleados::class, 'institucion_id');
+        return $this->belongsTo(TipoDocumento::class, 'tipo_documento_id');
     }
 }
