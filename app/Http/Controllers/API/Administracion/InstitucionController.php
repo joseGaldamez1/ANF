@@ -1,22 +1,23 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API\Administracion;
 
-use App\Models\Observaciones;
+use App\Http\Controllers\Controller;
+use App\Models\Institucion;
 use Illuminate\Http\Request;
 
-class ObservacionesController extends Controller
+class InstitucionController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $observaciones = Observaciones::all();
+        $instituciones = Institucion::all();
 
         return response()->json([
-            'message' => 'Lista de observaciones',
-            'data' => $observaciones
+            'message' => 'Instituciones recuperadas exitosamente',
+            'data' => $instituciones
         ]);
     }
 

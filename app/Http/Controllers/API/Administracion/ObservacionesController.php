@@ -1,50 +1,32 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API\Administracion;
 
-use App\Models\PuestosTrabajo;
+use App\Http\Controllers\Controller;
+use App\Models\Observaciones;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
-class PuestosTrabajoController extends Controller
+class ObservacionesController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $puestos = PuestosTrabajo::all();
+        $observaciones = Observaciones::all();
 
         return response()->json([
-            'message' => 'Lista de puestos de trabajo',
-            'data' => $puestos
+            'message' => 'Lista de observaciones',
+            'data' => $observaciones
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create()
     {
-        $validator = Validator::make($request->all(), [
-            'nombre' => 'required|string|max:255',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Error de validación',
-                'errors' => $validator->errors()
-            ], 400);
-        }
-
-        $puesto = PuestosTrabajo::create([
-            'nombre' => $request->nombre,
-        ]);
-
-        return response()->json([
-            'message' => 'Puesto de trabajo creado',
-            'data' => $puesto
-        ]);
+        //
     }
 
     /**
