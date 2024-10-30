@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API\Administracion;
 
+use App\Http\Controllers\Controller;
 use App\Models\Institucion;
 use Illuminate\Http\Request;
 
