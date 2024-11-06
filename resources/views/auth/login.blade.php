@@ -175,11 +175,12 @@
             <div class="register-show">
                 <h2>Universidad de El Salvador</h2>
                 <h2>Análisis Financiero</h2>
-                <h2>Licda. Xiomara</h2>
+                <h3>Licda. Xiomara Vasquez</h3>
                 <hr></hr>
                 <ul>
-                <li><h2>Alfonso Galdámez</h2></li>
-                <li><h2>Luis Merino</h2></li>
+                <li><h3>Luis Merino Quintanilla</h3></li>
+                <li><h3>José Alfonso Galdámez</h3></li>
+                <li><h3>Gabriela Stefani Miranda </h3></li>
                 </ul>
             </div>
         </div>

@@ -27,6 +27,7 @@ return new class extends Migration
             $table->date('fecha_ingreso');
             $table->unsignedBigInteger('institucion_id');
             $table->unsignedBigInteger('puesto_trabajo_id');
+            $table->decimal('salario',10,2);
             
             // Claves foráneas
             $table->foreign('tipo_documento_id')->references('id')->on('tipo_documento');

@@ -10,13 +10,10 @@
         "laravel/passport": "^12.3",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-<<<<<<< HEAD
-        "phpoffice/phpspreadsheet": "^3.3",
-        "tecnickcom/tcpdf": "^6.7"
-=======
         "laravel/ui": "^4.5",
-        "spatie/laravel-activitylog": "^4.9"
->>>>>>> a466d840175a25fe6e7acf979399ae896d30d0a8
+        "phpoffice/phpspreadsheet": "^3.3",
+        "spatie/laravel-activitylog": "^4.9",
+        "tecnickcom/tcpdf": "^6.7"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
