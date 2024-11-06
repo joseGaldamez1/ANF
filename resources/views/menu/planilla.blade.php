@@ -181,7 +181,8 @@
             const totalT = document.getElementById('totalPagoAdicional').value = total;
             const observacion11 = document.getElementById('observacion1').value = observacion1;
             const observacion22 = document.getElementById('observacion2').value = observacion2;
-            fechaIngreso.value = fecha;
+            fechaIngreso = fecha;
+            console.log(fechaIngreso);
             document.getElementById('editModal').style.display = 'flex';
             
 
