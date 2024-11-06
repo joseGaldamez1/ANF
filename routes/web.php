@@ -14,14 +14,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', function () {return view('welcome');});
 
-Route::get('/hash/{string}', function ($string) {
-    return Hash::make($string);
-});
+Route::get('/hash/{string}', function ($string) {return Hash::make($string);});
 
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
+Route::get('/login', function () {return view('auth.login');})->name('login');
+Route::get('/menu', function () {return view('auth.menu');})->name('menu');
+
