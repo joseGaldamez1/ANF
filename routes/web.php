@@ -20,4 +20,10 @@ Route::get('/hash/{string}', function ($string) {return Hash::make($string);});
 
 Route::get('/login', function () {return view('auth.login');})->name('login');
 Route::get('/menu', function () {return view('auth.menu');})->name('menu');
+Route::get('/puestosTrabajo', function () {return view('menu.puestosTrabajo');})->name('puestosTrabajo');
+Route::get('/empleados', function () {return view('menu.empleados');})->name('empleados');
+Route::get('/inicio', function () {return view('menu.inicio');})->name('inicio');
+Route::get('/planilla', function () {return view('menu.planilla');})->name('planilla');
+Route::get('/reportes', function () {return view('menu.reportes');})->name('reportes');
+Route::get('/ayuda', function () {return view('menu.ayuda');})->name('ayuda');
 

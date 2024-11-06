@@ -30,20 +30,23 @@
         <li><a href="/inicio"><i class="fa fa-home"></i>Inicio</a></li>
         <li><a href="/puestosTrabajo"><i class="fa fa-shopping-bag"></i>Puestos de trabajo</a></li>
         <li><a href="/empleados"><i class="fa fa-calendar"></i>Empleados</a></li>
-        <li><a href="/planilla"><i class="fa fa-link"></i>Planilla</a></li>
-        <li><a href="/reportes"><i class="fa fa-cog"></i>Reportes</a></li>
-        <li><a href="/ayuda"><i class="fa fa-question-circle-o"></i>Ayuda</a></li>     
+        <li><a href=""><i class="fa fa-link"></i>Planilla</a></li>
+        <li><a href="#"><i class="fa fa-cog"></i>Reportes</a></li>
+        <li><a href="#"><i class="fa fa-question-circle-o"></i>Ayuda</a></li>      
     </ul>
 </section>
-
-<style>
+<?php
+/*<style>
     .fondoMenu {
         background-image: url('@php echo asset("img/fondoMenu.jpg"); @endphp');
         background-size: cover;
     }
-</style>
+</style>*/
+?>
+
 <section class="container fondoMenu">
     <!-- Contenido principal aquí -->
+    <h1 style="text-align: center">Bienvenido al sistema de Gestion de Planillas</h1>
 </section>
 
 </body>

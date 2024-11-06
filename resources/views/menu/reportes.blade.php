@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proyecto Análisis Financiero</title>
+    <title>Reportes</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     @vite(['resources/css/custom/menu.css']) 
 </head>
@@ -35,15 +35,18 @@
         <li><a href="/ayuda"><i class="fa fa-question-circle-o"></i>Ayuda</a></li>     
     </ul>
 </section>
-
-<style>
+<?php
+/*<style>
     .fondoMenu {
         background-image: url('@php echo asset("img/fondoMenu.jpg"); @endphp');
         background-size: cover;
     }
-</style>
+</style>*/
+?>
+
 <section class="container fondoMenu">
     <!-- Contenido principal aquí -->
+    <h1 style="text-align: center">Reportes</h1>
 </section>
 
 </body>

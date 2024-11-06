@@ -114,6 +114,18 @@ class PuestosTrabajoController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $puesto = PuestosTrabajo::find($id);
+
+        if (!$puesto) {
+            return response()->json([
+                'message' => 'Puesto de trabajo no encontrado'
+            ], 404);
+        }
+
+        $puesto->delete();
+
+        return response()->json([
+            'message' => 'Puesto de trabajo eliminado'
+        ]);
     }
 }

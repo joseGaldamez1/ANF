@@ -93,7 +93,7 @@
                     window.location.href = '/menu';
                 },
                 error: function(err) {
-                    alert('El inicio de sesión falló. Pida a Alfonso que revise que sucede.');
+                    alert('Acceso incorrecto.');
                 }
             });
         }
