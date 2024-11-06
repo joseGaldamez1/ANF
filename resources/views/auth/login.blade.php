@@ -6,122 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PROYECTO ANF</title>
 
-    <!-- CSS Bootstrap and Custom Styles -->
+    <!-- para Bootstrap y estilos personalizados -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        /* Your CSS styles here */
-        @import url('https://fonts.googleapis.com/css?family=Mukta');
+    @vite(['resources/css/custom/login.css', 'resources/js/app.js'])
 
-        body {
-            font-family: 'Mukta', sans-serif;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #335066 !important;
-            margin: 0;
-            overflow-y: hidden;
-        }
-
-        .login-reg-panel {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            text-align: center;
-            width: 70%;
-            margin: auto;
-            height: 400px;
-            background-color: rgba(244, 244, 214, 1);
-        }
-
-        .white-panel {
-            background-color: rgba(255, 255, 255, 1);
-            height: 500px;
-            position: absolute;
-            top: -50px;
-            width: 50%;
-            right: calc(50% - 50px);
-            transition: .3s ease-in-out;
-            z-index: 0;
-            box-shadow: 0 0 15px 9px #00000096;
-        }
-
-        .right-log {
-            right: 50px !important;
-        }
-
-        .login-info-box,
-        .register-info-box {
-            width: 30%;
-            padding: 0 50px;
-            top: 20%;
-            position: absolute;
-            text-align: left;
-        }
-
-        .login-info-box {
-            left: 0;
-        }
-
-        .register-info-box {
-            right: 0;
-        }
-
-        .login-show,
-        .register-show {
-            z-index: 1;
-            display: none;
-            opacity: 0;
-            transition: 0.3s ease-in-out;
-            color: #242424;
-            text-align: left;
-            padding: 50px;
-        }
-
-        .show-log-panel {
-            display: block;
-            opacity: 0.9;
-        }
-
-        .login-show input,
-        .register-show input {
-            width: 100%;
-            margin: 20px 0;
-            padding: 15px;
-            border: 1px solid #b5b5b5;
-            outline: none;
-        }
-
-        .login-show input[type="button"],
-        .register-show input[type="button"] {
-            max-width: 150px;
-            width: 100%;
-            background: #444444;
-            color: #f9f9f9;
-            border: none;
-            padding: 10px;
-            text-transform: uppercase;
-            border-radius: 2px;
-            cursor: pointer;
-        }
-
-        .credit {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            color: #3B3B25;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            text-transform: uppercase;
-            font-size: 12px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            z-index: 99;
-        }
-    </style>
-
-    <!-- jQuery and Bootstrap JavaScript -->
+    <!-- para jQuery y Bootstrap JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
@@ -201,7 +90,7 @@
                 }),
                 success: function(data) {
                     localStorage.setItem('access_token', data.access_token);
-                    window.location.href = '/home';
+                    window.location.href = '/menu';
                 },
                 error: function(err) {
                     alert('El inicio de sesión falló. Pida a Alfonso que revise que sucede.');
