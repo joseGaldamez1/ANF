@@ -8,19 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Empleados extends Model
 {
     use HasFactory;
-        // Nombre de la tabla
         protected $table = 'empleados';
-
-        // Clave primaria de la tabla
         protected $primaryKey = 'id';
-    
-        // Indica que el modelo tiene claves primarias autoincrementales
         public $incrementing = true;
-    
-        // Tipo de clave primaria
         protected $keyType = 'int';
     
-        // Campos que se pueden asignar de forma masiva
         protected $fillable = [
             'nombre1',
             'nombre2',
@@ -33,6 +25,7 @@ class Empleados extends Model
             'direccion',
             'telefono',
             'correo',  
+            'salario',
             'fecha_ingreso',
             'institucion_id',
             'puesto_trabajo_id',

@@ -8,22 +8,17 @@ use Illuminate\Support\Facades\Validator;
 
 class EmpleadosController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
-        $empleados = Empleados::with( 'institucion', 'puestoTrabajo', 'tipoDocumento')->get();
+        $empleados = Empleados::with('institucion', 'puestoTrabajo', 'tipoDocumento')->get();
 
         return response()->json([
             'message' => 'Lista de empleados',
             'data' => $empleados
-        ]);
+        ], 200); 
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -35,6 +30,7 @@ class EmpleadosController extends Controller
             'direccion' => 'required',
             'telefono' => 'required',
             'correo' => 'required',
+            'salario' => 'required',
             'fecha_ingreso' => 'required',
             'institucion_id' => 'required',
             'puesto_trabajo_id' => 'required',
@@ -44,7 +40,7 @@ class EmpleadosController extends Controller
             return response()->json([
                 'message' => 'Error en la validación',
                 'errors' => $validator->errors()
-            ]);
+            ], 422); 
         }
 
         $empleado = Empleados::create([
@@ -59,6 +55,7 @@ class EmpleadosController extends Controller
             'direccion' => $request->direccion,
             'telefono' => $request->telefono,
             'correo' => $request->correo,
+            'salario' =>  $request->salario,
             'fecha_ingreso' => $request->fecha_ingreso,
             'institucion_id' => $request->institucion_id,
             'puesto_trabajo_id' => $request->puesto_trabajo_id,
@@ -67,42 +64,25 @@ class EmpleadosController extends Controller
         return response()->json([
             'message' => 'Empleado creado exitosamente',
             'data' => $empleado
-        ]);
-
+        ], 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        $empleado = Empleados::with( 'institucion', 'puestoTrabajo', 'tipoDocumento')->where('id', $id)->get();
+        $empleado = Empleados::with('institucion', 'puestoTrabajo', 'tipoDocumento')->where('id', $id)->first();
+
+        if (!$empleado) {
+            return response()->json([
+                'message' => 'Empleado no encontrado'
+            ], 404); 
+        }
 
         return response()->json([
-            'message' => 'Empleado',
+            'message' => 'Empleado encontrado',
             'data' => $empleado
-        ]);
+        ], 200); 
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $empleado = Empleados::find($id);
@@ -110,7 +90,29 @@ class EmpleadosController extends Controller
         if (!$empleado) {
             return response()->json([
                 'message' => 'Empleado no encontrado'
-            ]);
+            ], 404); 
+        }
+
+        $validator = Validator::make($request->all(), [
+            'nombre1' => 'required',
+            'apellido1' => 'required',
+            'tipo_documento_id' => 'required',
+            'numero_documento' => 'required',
+            'numero_afiliado' => 'required',
+            'direccion' => 'required',
+            'telefono' => 'required',
+            'correo' => 'required',
+            'salario' => 'required',
+            'fecha_ingreso' => 'required',
+            'institucion_id' => 'required',
+            'puesto_trabajo_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Error en la validación',
+                'errors' => $validator->errors()
+            ], 422); 
         }
 
         $empleado->update($request->all());
@@ -118,26 +120,23 @@ class EmpleadosController extends Controller
         return response()->json([
             'message' => 'Empleado actualizado',
             'data' => $empleado
-        ]);
+        ], 200); 
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy( $id)
+    public function destroy($id)
     {
         $empleado = Empleados::find($id);
 
         if (!$empleado) {
             return response()->json([
                 'message' => 'Empleado no encontrado'
-            ]);
+            ], 404); 
         }
 
         $empleado->delete();
 
         return response()->json([
             'message' => 'Empleado eliminado'
-        ]);
+        ], 200); 
     }
 }
