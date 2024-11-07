@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Empleados;
 use App\Models\Planilla;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -17,12 +18,15 @@ class ReportesController extends Controller
      */
     public function index()
     {
-        //
+       
     }
 
     public function planillaPDF(string $periodo)
     {
-        $planilla = Planilla::with('pagoAdicional', 'observacion1', 'observacion2', 'empleado', 'empleador')->where('periodo', $periodo)->get();
+        $planilla = Planilla::with('pagoAdicional', 'observacion1', 'observacion2', 'empleado', 'empleador')
+        ->where('periodo', $periodo)
+        ->where('estado', 'Finalizada')
+        ->get();
         $pdf = new \TCPDF();
         $pdf->AddPage();
         $pdf->setPageOrientation('L');
@@ -61,6 +65,13 @@ class ReportesController extends Controller
         $contador = 1;
         $total = 0;
         $totalPlanilla = 0;
+        if ($planilla->isEmpty()) {
+            $tablaPlanilla .= '
+                <tr style="font-size: 9px; border: 1px dotted black">
+                    <td colspan="14" style="border: 1px dashed gray; text-align: center;">No hay datos disponibles.</td>
+                </tr>';
+        }
+        
         foreach ($planilla as $plan) {
             $total = $plan->salario + $plan->pagoAdicional->monto_hora_diurna + $plan->pagoAdicional->monto_hora_nocturna + $plan->pagoAdicional->vacaciones + $plan->pagoAdicional->indemnizacion + $plan->pagoAdicional->aguinaldo;
             $renta = $this->calcularRenta($total);
@@ -101,6 +112,8 @@ class ReportesController extends Controller
             ->header('Content-Type', 'application/pdf');
     }
 
+
+
     function calcularRenta($sueldo)
     {
         // Calcular AFP (7.25%) y ISSS (3% o $30 máximo)
@@ -135,7 +148,17 @@ class ReportesController extends Controller
     public function empleadoPDF($periodo, $id)
     {
 
-        $planilla = Planilla::with('pagoAdicional', 'observacion1', 'observacion2', 'empleado', 'empleador')->where('periodo', $periodo)->where('empleado_id', $id)->get();
+        $planilla = Planilla::with('pagoAdicional', 'observacion1', 'observacion2', 'empleado', 'empleador')
+        ->where('periodo', $periodo)
+        ->where('empleado_id', $id)
+        ->where('estado', 'Finalizada')
+        ->get();
+
+        if($planilla->isEmpty()){
+            return response()->json([
+                'message' => 'No se encontró registro'
+            ]);
+        }
 
         $pdf = new \TCPDF();
         $pdf->AddPage();
@@ -233,7 +256,16 @@ class ReportesController extends Controller
 
     public function planillaExcel($periodo)
     {
-        $planilla = Planilla::with('pagoAdicional', 'observacion1', 'observacion2', 'empleado', 'empleador')->where('periodo', $periodo)->get();
+        $planilla = Planilla::with('pagoAdicional', 'observacion1', 'observacion2', 'empleado', 'empleador')
+        ->where('periodo', $periodo)
+        ->where('estado', 'Finalizada')        
+        ->get();
+
+        if($planilla->isEmpty()){
+            return response()->json([
+                'message' => 'No se encontró registro'
+            ]);
+        }
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();

@@ -7,8 +7,11 @@ use App\Models\Empleados;
 use App\Models\PagoAdicional;
 use App\Models\Planilla;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class PlanillaController extends Controller
 {
@@ -19,24 +22,24 @@ class PlanillaController extends Controller
     {
         $this->reportesController = $reportesController;
     }
-    
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         $planilla = Planilla::with('pagoAdicional', 'observacion1', 'observacion2', 'empleado', 'empleador')
-        ->where('estado', 'Activa')
-        ->get();
+            ->where('estado', 'Activa')
+            ->get();
 
         if ($planilla->isEmpty()) {
             return response()->json([
                 'message' => 'No hay planillas iniciadas'
             ]);
         }
-        
+
         return response()->json([
-            'message' => 'Planilla de pagos',   
+            'message' => 'Planilla de pagos',
             'data' => $planilla
         ]);
     }
@@ -45,18 +48,18 @@ class PlanillaController extends Controller
     {
         // Obtiene todas las planillas del periodo especificado
         $planillas = Planilla::with('pagoAdicional', 'observacion1', 'observacion2', 'empleado', 'empleador')
-                            ->where('periodo', $periodo)
-                            ->get();
-    
+            ->where('periodo', $periodo)
+            ->get();
+
         foreach ($planillas as $planilla) {
             // Genera el PDF para cada empleado
             $reporte = $this->reportesController->empleadoPDF($periodo, $planilla->empleado_id);
             $pdf = $reporte->getContent();
-    
+
             // Datos del empleado
             $email = $planilla->empleado->correo;
             $nombreCompleto = $planilla->empleado->nombre1 . ' ' . $planilla->empleado->nombre2 . ' ' . $planilla->empleado->apellido1 . ' ' . $planilla->empleado->apellido2 . ' ' . $planilla->empleado->apellido_casada;
-    
+
             // Verifica si el correo es válido
             if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 // Enviar el correo al empleado
@@ -66,12 +69,12 @@ class PlanillaController extends Controller
                 Log::warning("Correo no válido para el empleado: $nombreCompleto ($email)");
             }
         }
-    
+
         return response()->json([
             'message' => 'Correos enviados a todos los empleados'
         ]);
     }
-    
+
 
     /**
      * Show the form for creating a new resource.
@@ -89,7 +92,7 @@ class PlanillaController extends Controller
         }
         //Agregar todos los empleados a la planilla
         $empleados = Empleados::all();
-        
+
         foreach ($empleados as $empleado) {
 
             $pagaAdicional = PagoAdicional::create([
@@ -123,30 +126,45 @@ class PlanillaController extends Controller
 
         return response()->json([
             'message' => 'Planilla creada para el periodo ' . $periodo,
-            'data' =>[ 
+            'data' => [
                 'planilla' => $planilla,
-                 'pago adicional' => $pagaAdicional
+                'pago adicional' => $pagaAdicional
             ]
 
 
         ]);
-
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function emitir()
     {
-        //
+        // Obtener todas las planillas activas
+        $planillas = Planilla::where('estado', 'Activa')->get();
+
+        if ($planillas->isEmpty()) {
+            return response()->json([
+                'message' => 'No se encontraron planillas activas.',
+            ], 404);
+        }
+
+        foreach ($planillas as $planilla) {
+            $planilla->estado = 'Finalizada';
+            $planilla->save();
+        }
+
+        return response()->json([
+            'message' => 'Planillas finalizadas',
+            'data' => $planillas, 
+        ]);
     }
+
 
     /**
      * Mostrar unplanilla por id
      */
-    public function show($periodo)
-    {
-    }
+    public function show($periodo) {}
 
     /**
      * Show the form for editing the specified resource.
@@ -159,10 +177,70 @@ class PlanillaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'cantidad_hora_diurna' => 'required|numeric',
+            'monto_hora_diurna' => 'required|numeric',
+            'cantidad_hora_nocturna' => 'required|numeric',
+            'monto_hora_nocturna' => 'required|numeric',
+            'vacaciones' => 'required|numeric',
+            'aguinaldo' => 'required|numeric',
+            'indemnizacion' => 'required|numeric',
+            'observacion1_id' => 'required|numeric',
+            'observacion2_id' => 'required|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'error',
+                'errors' => $validator->errors()
+            ]);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // Actualizar el detalle de pago adicional de la planilla
+            $planilla = Planilla::find($id);
+            $pagoAdicional = PagoAdicional::find($planilla->pago_adicional_id);
+
+            $pagoAdicional->update([
+                'cantidad_hora_diurna' => $request->cantidad_hora_diurna,
+                'monto_hora_diurna' => $request->monto_hora_diurna,
+                'cantidad_hora_nocturna' => $request->cantidad_hora_nocturna,
+                'monto_hora_nocturna' => $request->monto_hora_nocturna,
+                'vacaciones' => $request->vacaciones,
+                'aguinaldo' => $request->aguinaldo,
+                'indemnizacion' => $request->indemnizacion,
+            ]);
+
+            // Actualizar el detalle de la planilla
+            $planilla->update([
+                'monto_pago_adicional' => $request->pago_adicional,
+                'monto_vacaciones' => $pagoAdicional->vacaciones,
+                'dias' => $request->dias,
+                'horas' => $request->horas,
+                'dias_vacaciones' => '15',
+                'observacion1_id' => $request->observacion1_id,
+                'observacion2_id' => $request->observacion2_id,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'success',
+                'data' => $planilla
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'error',
+                'data' => $e->getMessage()
+            ]);
+        }
     }
+
 
     /**
      * Remove the specified resource from storage.

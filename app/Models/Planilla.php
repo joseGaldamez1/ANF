@@ -34,6 +34,7 @@ class Planilla extends Model
         'observacion2_id',
         'empleado_id',
         'empleador_id',
+        'estado',
     ];
 
     public $hidden = [

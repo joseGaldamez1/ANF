@@ -71,6 +71,7 @@
             </select>
 
             <button id="btnCrear"
+                onclick="handleCrearPlanilla()"
                 style="padding: 8px 12px; font-size: 16px; border-radius: 5px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">
                 Crear nueva planilla
             </button>
@@ -102,7 +103,8 @@
             </tbody>
         </table>
         <br>
-        <button id="btnAdd" style="display: block; margin: 0 auto; border: 1px solid black">Emitir planilla</button>
+        <button id="btnAdd" onclick="guardarPlanilla()"
+            style="display: block; margin: 0 auto; border: 1px solid black">Guardar planilla</button>
     </section>
 
     <!-- Modal para Modificar los pagos adicionales -->
@@ -110,81 +112,103 @@
         <div class="modal-content" style="height: 400px; width: 750px">
             <span class="close-btn" onclick="closeModal()">&times;</span>
             <h2>Modificar Planilla</h2>
-            <form id="formEdit">
-                <input type="hidden" id="id" name="id">
+            <input type="hidden" id="id" name="id">
 
-                <label for="salario">Salario:</label>
-                <input type="number" id="salario" name="salario" readonly><br><br>
+            <label for="salario">Salario:</label>
+            <input type="number" id="salario" name="salario" readonly><br><br>
 
-                <label for="horasDiurnas">Horas extras diurnas:</label>
-                <input type="number" id="horasDiurnas" name="horasDiurnas">
+            <label for="horasDiurnas">Horas extras diurnas:</label>
+            <input type="number" id="horasDiurnas" name="horasDiurnas">
 
-                <label for="montoHorasDiurnas">Total:</label>
-                <input type="number" id="montoHorasDiurnas" name="montoHorasDiurnas" readonly><br><br>
+            <label for="montoHorasDiurnas">Total:</label>
+            <input type="number" id="montoHorasDiurnas" name="montoHorasDiurnas" readonly><br><br>
 
-                <label for="horasNocturnas">Horas extras nocturnas:</label>
-                <input type="number" id="horasNocturnas" name="horasNocturnas">
+            <label for="horasNocturnas">Horas extras nocturnas:</label>
+            <input type="number" id="horasNocturnas" name="horasNocturnas">
 
-                <label for="montoHorasNocturnas">Total:</label>
-                <input type="number" id="montoHorasNocturnas" name="montoHorasNocturnas" readonly><br><br>
+            <label for="montoHorasNocturnas">Total:</label>
+            <input type="number" id="montoHorasNocturnas" name="montoHorasNocturnas" readonly><br><br>
 
-                <label for="vacacionesCheck">Incluir Vacaciones:</label>
-                <input type="checkbox" id="vacacionesCheck" name="vacacionesCheck">
-
-
-                <label for="vacaciones">Total:</label>
-                <input type="number" id="vacaciones" name="vacaciones"><br><br>
-
-                <label for="indemnizacionCheck">Incluir Indemnizacion:</label>
-                <input type="checkbox" id="indemnizacionCheck" name="indemnizacionCheck">
-
-                <label for="indemnizacion">Total:</label>
-                <input type="number" id="indemnizacion" name="indemnizacion"><br><br>
+            <label for="vacacionesCheck">Incluir Vacaciones:</label>
+            <input type="checkbox" id="vacacionesCheck" name="vacacionesCheck">
 
 
-                <label for="totalPagoAdicional">Total Pago Adicional:</label>
-                <input type="number" id="totalPagoAdicional" name="totalPagoAdicional" readonly><br><br>
+            <label for="vacaciones">Total:</label>
+            <input type="number" id="vacaciones" name="vacaciones"><br><br>
+
+            <label for="indemnizacionCheck">Incluir Indemnizacion:</label>
+            <input type="checkbox" id="indemnizacionCheck" name="indemnizacionCheck">
+
+            <label for="indemnizacion">Total:</label>
+            <input type="number" id="indemnizacion" name="indemnizacion"><br><br>
 
 
-                <label for="observacion1">Observación 1:</label>
-                <select id="observacion1" name="observacion1">
-                   
-                </select><br><br>
+            <label for="totalPagoAdicional">Total Pago Adicional:</label>
+            <input type="number" id="totalPagoAdicional" name="totalPagoAdicional" readonly><br><br>
 
-                <label for="observacion2">Observación 2:</label>
-                <select id="observacion2" name="observacion2" required>
-                </select><br><br>
 
-                <button id="btnAdd" type="submit" class="submit-btn">Guardar</button>
-            </form>
+            <label for="observacion1">Observación 1:</label>
+            <select id="observacion1" name="observacion1">
+
+            </select><br><br>
+
+            <label for="observacion2">Observación 2:</label>
+            <select id="observacion2" name="observacion2">
+            </select><br><br>
+
+            <button id="btnAdd" onclick="onSave()">Guardar</button>
         </div>
     </div>
 
 
     <script>
-        //Abrir modal para editar planilla
+        // Variables globales para el modal de edición de planilla
         let currentPlanillaId = null;
+        let salarioC;
+        let montoHorasDiurnas;
+        let montoHorasNocturnas;
+        let horasDiurnas;
+        let horasNocturnas;
+        let vacacionesT;
+        let indemnizacionT;
+        let totalT;
+        let observacion11;
+        let observacion22;
+        let fechaIngreso;
 
-        let salarioC; // Variable global para referenciar el campo de salario
-        let fechaIngreso; // Variable global para referenciar el campo de fecha
-
-        function openModal(id, salario, horasDia, horasNoche, totalDia, totalNoche, vacaciones, indemnizacion, total, observacion1, observacion2, fecha) {
+        function openModal(id, salario, horasDia, horasNoche, totalDia, totalNoche, vacaciones, indemnizacion, total,
+            observacion1, observacion2, fecha) {
             currentPlanillaId = id;
+
+            // Asignar valores a los elementos de entrada y almacenar referencias globales
             salarioC = document.getElementById('salario');
+            montoHorasDiurnas = document.getElementById('montoHorasDiurnas');
+            montoHorasNocturnas = document.getElementById('montoHorasNocturnas');
+            horasDiurnas = document.getElementById('horasDiurnas');
+            horasNocturnas = document.getElementById('horasNocturnas');
+            vacacionesT = document.getElementById('vacaciones');
+            indemnizacionT = document.getElementById('indemnizacion');
+            totalT = document.getElementById('totalPagoAdicional');
+            observacion11 = document.getElementById('observacion1');
+            observacion22 = document.getElementById('observacion2');
+
+            // Asignar valores a cada campo
             salarioC.value = salario;
-            const montoHorasDiurnas = document.getElementById('montoHorasDiurnas').value = totalDia;
-            const montoHorasNocturnas = document.getElementById('montoHorasNocturnas').value = totalNoche;
-            const horasDiurnas = document.getElementById('horasDiurnas').value = horasDia;;
-            const horasNocturnas = document.getElementById('horasNocturnas').value = horasNoche;;
-            const vacacionesT = document.getElementById('vacaciones').value = vacaciones;
-            const indemnizacionT = document.getElementById('indemnizacion').value = indemnizacion;
-            const totalT = document.getElementById('totalPagoAdicional').value = total;
-            const observacion11 = document.getElementById('observacion1').value = observacion1;
-            const observacion22 = document.getElementById('observacion2').value = observacion2;
+            montoHorasDiurnas.value = totalDia;
+            montoHorasNocturnas.value = totalNoche;
+            horasDiurnas.value = horasDia;
+            horasNocturnas.value = horasNoche;
+            vacacionesT.value = vacaciones;
+            indemnizacionT.value = indemnizacion;
+            totalT.value = total;
+            observacion11.value = observacion1;
+            observacion22.value = observacion2;
+
+            // Guardar la fecha de ingreso como valor global
             fechaIngreso = fecha;
-            console.log(fechaIngreso);
+
+            // Mostrar el modal
             document.getElementById('editModal').style.display = 'flex';
-            
 
             // Llamar a calcularHoras para iniciar el cálculo
             calcularHoras();
@@ -194,24 +218,31 @@
             const precioHora = parseFloat(salarioC.value) / 240;
             const hdiurnas = parseFloat(document.getElementById('horasDiurnas').value) || 0;
             const hnocturnas = parseFloat(document.getElementById('horasNocturnas').value) || 0;
-            
+
 
             // Verificar si el checkbox de vacaciones está activado
             const vacacionesCheck = document.getElementById('vacacionesCheck').checked;
             let vacaciones = 0;
 
             if (vacacionesCheck) {
-                vacaciones = parseFloat(salarioC.value / 2) * 0.3; 
+                vacaciones = parseFloat(salarioC.value / 2) * 0.3;
             }
 
             //verificar si el checkbox de indemnización está activado
             const indemnizacionCheck = document.getElementById('indemnizacionCheck').checked;
             let indemnizacion = 0;
             if (indemnizacionCheck) {
-                fechaActual = new Date();
-                diferenciaAnios = (fechaActual - fechaIngreso) / (1000 * 3600 * 24 * 365.25);
-                indemnizacion = (salarioC.value / diferenciaAnios) * 0.3;
+                // Calcula la indemnización
+                const fechaActual = new Date();
+                const fechaIngresoDate = new Date(fechaIngreso);
+
+                // Calcula la diferencia en años
+                const diferenciaAnios = ((fechaActual - fechaIngresoDate) / (1000 * 3600 * 24 * 365)).toFixed(10);
+
+                // Calcula la indemnización
+                indemnizacion = (salarioC.value * 1);
             }
+
 
             const montoHorasDiurnas = document.getElementById('montoHorasDiurnas');
             const montoHorasNocturnas = document.getElementById('montoHorasNocturnas');
@@ -237,7 +268,7 @@
         document.getElementById('horasDiurnas').addEventListener('input', calcularHoras);
         document.getElementById('horasNocturnas').addEventListener('input', calcularHoras);
         document.getElementById('vacacionesCheck').addEventListener('change',
-        calcularHoras); 
+            calcularHoras);
         document.getElementById('indemnizacionCheck').addEventListener('change', calcularHoras);
 
         // Cerrar modal
@@ -245,6 +276,43 @@
             document.getElementById('editModal').style.display = 'none';
         }
 
+
+        // FUNCIÓN PARA EDITAR LA PLANILLA DE UN EMPLEADO ESPECÍFICO
+        function onSave() {
+            const accessToken = localStorage.getItem('access_token');
+
+            // Recoger los datos actualizados del formulario
+            const data = {
+                cantidad_hora_diurna: horasDiurnas.value,
+                monto_hora_diurna: montoHorasDiurnas.value,
+                cantidad_hora_nocturna: horasNocturnas.value,
+                monto_hora_nocturna: montoHorasNocturnas.value,
+                vacaciones: vacacionesT.value,
+                pago_adicional: totalT.value,
+                aguinaldo: 0,
+                indemnizacion: indemnizacionT.value,
+                dias: 30,
+                horas: 170,
+                observacion1_id: observacion11.value,
+                observacion2_id: observacion22.value,
+            };
+            console.log(data);
+
+            axios.put(`/api/planilla/${currentPlanillaId}`, data, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                })
+                .then(function(response) {
+                    alert("Pago adicional agregado exitosamente.");
+                    closeModal();
+                    handleGetEmpleado();
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    alert('Error al agregar el pago adicional.');
+                });
+        }
 
 
 
@@ -259,7 +327,7 @@
 
 
             //Petición GET a la API
-            axios.get(`/api/planilla/`, {
+            axios.get(`/api/planilla/listar`, {
                     headers: {
                         'Authorization': `Bearer ${accessToken}`
                     }
@@ -289,7 +357,7 @@
                     <td>${plan.dias}</td>
                     <td>${plan.horas}</td>
                     <td>${plan.dias_vacaciones}</td>
-                    <td>${plan.observacion2.codigo} - ${plan.observacion1.concepto}</td>
+                    <td>${plan.observacion1.codigo} - ${plan.observacion1.concepto}</td>
                     <td>${plan.observacion2.codigo} - ${plan.observacion2.concepto}</td>
                     <td>
                         <button id="btnAdd" onclick="openModal(
@@ -309,15 +377,70 @@
                 `;
                             tbody.appendChild(tr);
                         });
-                    } else {
-                        alert('No se encontraron planilla activa');
-                    }
+                    } else {}
                 })
                 .catch(function(error) {
                     console.error('Error al obtener la planilla:', error);
                 });
         }
         handleGetEmpleado();
+
+
+
+        // FUNCION PARA GUARDAR LA PLANILLA
+        function guardarPlanilla() {
+            const accessToken = localStorage.getItem('access_token');
+
+            // GET para finalizar la planilla
+            axios.get(`/api/planilla/`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                })
+                .then(function(response) {
+                    if(response.data){
+                        console.log(response.data.data);
+                        alert('Planilla guardada exitosamente.');
+                        window.location.reload();
+                        handleGetEmpleado();
+                    }else{
+                    alert('Planilla guardada exitosamente.');
+                    handleGetEmpleado();
+                    window.location.reload()
+                    }
+                })
+                .catch(function(error) {
+                    // Manejo de errores
+                    console.error('Error:', error);
+                    alert('Error al guardar la planilla.');
+                })
+        }
+    </script>
+
+    <!-- API para iniciar una planilla nueva-->
+    <script>
+        function handleCrearPlanilla() {
+            const accessToken = localStorage.getItem('access_token');
+            const select = document.getElementById('selectedPeriodo').value;
+
+            axios.post(`/api/planilla/${select}`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                })
+                .then(function(response) {
+                    if(response.data.message == `Ya existe una planilla para el periodo ${select}`){
+                        alert(`Ya existe una planilla para el periodo ${select}`);
+                    }else{
+                    alert('Planilla iniciada, a continuacion modifique los empleados que desee o proceda a guardar la planilla.');
+                    handleGetEmpleado();
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    alert('Error al crear la planilla.');
+                });
+            }
     </script>
 
     <!-- API para obtener las observaciones -->
@@ -362,6 +485,7 @@
     </script>
 
 </body>
+
 </html>
 
 <script>

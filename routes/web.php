@@ -14,11 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {return view('welcome');});
+//Route::get('/', function () {return view('login');});
 
 Route::get('/hash/{string}', function ($string) {return Hash::make($string);});
 
-Route::get('/login', function () {return view('auth.login');})->name('login');
+Route::get('/', function () {return view('auth.login');})->name('login');
 Route::get('/menu', function () {return view('auth.menu');})->name('menu');
 Route::get('/puestosTrabajo', function () {return view('menu.puestosTrabajo');})->name('puestosTrabajo');
 Route::get('/empleados', function () {return view('menu.empleados');})->name('empleados');

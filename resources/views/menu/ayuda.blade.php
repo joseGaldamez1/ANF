@@ -47,6 +47,8 @@
 <section class="container fondoMenu">
     <!-- Contenido principal aquí -->
     <h1 style="text-align: center">Ayuda</h1>
+    <p>https://www.pisto.co/liquidacion-laboral-en-el-salvador/</p>
+    <p>https://www.toptrabajos.com/blog/sv/calcular-vacaciones-de-ley/?</p>
 </section>
 
 </body>
