@@ -35,16 +35,19 @@
         <li><a href="/ayuda"><i class="fa fa-question-circle-o"></i>Ayuda</a></li>     
     </ul>
 </section>
-
+<?php
+/*
 <style>
     .fondoMenu {
         background-image: url('@php echo asset("img/fondoMenu.jpg"); @endphp');
         background-size: cover;
     }
-</style>
+</style>*/
+?>
 <section class="container fondoMenu">
     <!-- Contenido principal aquí -->
 </section>
+
 
 </body>
 </html>

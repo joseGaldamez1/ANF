@@ -136,12 +136,8 @@
             <label for="vacaciones">Total:</label>
             <input type="number" id="vacaciones" name="vacaciones"><br><br>
 
-            <label for="indemnizacionCheck">Incluir Indemnizacion:</label>
-            <input type="checkbox" id="indemnizacionCheck" name="indemnizacionCheck">
-
-            <label for="indemnizacion">Total:</label>
-            <input type="number" id="indemnizacion" name="indemnizacion"><br><br>
-
+            <label for="aguinaldo">Aguinaldo:</label>
+            <input type="number" id="aguinaldo" name="aguinaldo" readonly><br><br>
 
             <label for="totalPagoAdicional">Total Pago Adicional:</label>
             <input type="number" id="totalPagoAdicional" name="totalPagoAdicional" readonly><br><br>
@@ -170,14 +166,14 @@
         let horasDiurnas;
         let horasNocturnas;
         let vacacionesT;
-        let indemnizacionT;
         let totalT;
         let observacion11;
         let observacion22;
         let fechaIngreso;
+        let aguinaldoT;
+        let diasVacaciones = 0;
 
-        function openModal(id, salario, horasDia, horasNoche, totalDia, totalNoche, vacaciones, indemnizacion, total,
-            observacion1, observacion2, fecha) {
+        function openModal(id, salario, horasDia, horasNoche, totalDia, totalNoche, vacaciones, aguinaldo, total,  observacion1, observacion2, fecha) {
             currentPlanillaId = id;
 
             // Asignar valores a los elementos de entrada y almacenar referencias globales
@@ -187,10 +183,10 @@
             horasDiurnas = document.getElementById('horasDiurnas');
             horasNocturnas = document.getElementById('horasNocturnas');
             vacacionesT = document.getElementById('vacaciones');
-            indemnizacionT = document.getElementById('indemnizacion');
             totalT = document.getElementById('totalPagoAdicional');
             observacion11 = document.getElementById('observacion1');
             observacion22 = document.getElementById('observacion2');
+            aguinaldoT = document.getElementById('aguinaldo');
 
             // Asignar valores a cada campo
             salarioC.value = salario;
@@ -199,10 +195,10 @@
             horasDiurnas.value = horasDia;
             horasNocturnas.value = horasNoche;
             vacacionesT.value = vacaciones;
-            indemnizacionT.value = indemnizacion;
             totalT.value = total;
             observacion11.value = observacion1;
             observacion22.value = observacion2;
+            aguinaldoT.value = aguinaldo;
 
             // Guardar la fecha de ingreso como valor global
             fechaIngreso = fecha;
@@ -223,42 +219,27 @@
             // Verificar si el checkbox de vacaciones está activado
             const vacacionesCheck = document.getElementById('vacacionesCheck').checked;
             let vacaciones = 0;
+            
 
             if (vacacionesCheck) {
                 vacaciones = parseFloat(salarioC.value / 2) * 0.3;
+                diasVacaciones = 15;
+
             }
 
-            //verificar si el checkbox de indemnización está activado
-            const indemnizacionCheck = document.getElementById('indemnizacionCheck').checked;
-            let indemnizacion = 0;
-            if (indemnizacionCheck) {
-                // Calcula la indemnización
-                const fechaActual = new Date();
-                const fechaIngresoDate = new Date(fechaIngreso);
-
-                // Calcula la diferencia en años
-                const diferenciaAnios = ((fechaActual - fechaIngresoDate) / (1000 * 3600 * 24 * 365)).toFixed(10);
-
-                // Calcula la indemnización
-                indemnizacion = (salarioC.value * 1);
-            }
-
-
+            
             const montoHorasDiurnas = document.getElementById('montoHorasDiurnas');
             const montoHorasNocturnas = document.getElementById('montoHorasNocturnas');
             const total = document.getElementById('totalPagoAdicional');
             const totalVacaciones = document.getElementById('vacaciones');
-            const totalIndemnizacion = document.getElementById('indemnizacion');
 
             // Calcular monto de horas diurnas y nocturnas
             montoHorasDiurnas.value = (hdiurnas * 2 * precioHora).toFixed(2);
-            montoHorasNocturnas.value = (hnocturnas * 2.25 * precioHora).toFixed(2);
+            montoHorasNocturnas.value = (hnocturnas * 2.50 * precioHora).toFixed(2);
             totalVacaciones.value = vacaciones.toFixed(2);
-            totalIndemnizacion.value = indemnizacion.toFixed(2);
 
             // Sumar el total de horas diurnas, nocturnas, vacaciones e indemnización
-            const totalPago = parseFloat(montoHorasDiurnas.value) + parseFloat(montoHorasNocturnas.value) + vacaciones +
-                indemnizacion;
+            const totalPago = parseFloat(montoHorasDiurnas.value) + parseFloat(montoHorasNocturnas.value) + vacaciones + parseFloat(aguinaldoT.value);
 
             // Mostrar el total en el input
             total.value = totalPago.toFixed(2);
@@ -267,9 +248,8 @@
         // Mostrar en el input
         document.getElementById('horasDiurnas').addEventListener('input', calcularHoras);
         document.getElementById('horasNocturnas').addEventListener('input', calcularHoras);
-        document.getElementById('vacacionesCheck').addEventListener('change',
-            calcularHoras);
-        document.getElementById('indemnizacionCheck').addEventListener('change', calcularHoras);
+        document.getElementById('vacacionesCheck').addEventListener('change', calcularHoras);
+    
 
         // Cerrar modal
         function closeModal() {
@@ -289,8 +269,7 @@
                 monto_hora_nocturna: montoHorasNocturnas.value,
                 vacaciones: vacacionesT.value,
                 pago_adicional: totalT.value,
-                aguinaldo: 0,
-                indemnizacion: indemnizacionT.value,
+                dias_vacaciones: diasVacaciones,
                 dias: 30,
                 horas: 170,
                 observacion1_id: observacion11.value,
@@ -368,11 +347,11 @@
                         '${plan.pago_adicional.monto_hora_diurna}', 
                         '${plan.pago_adicional.monto_hora_nocturna}',
                         '${plan.pago_adicional.vacaciones}', 
-                        '${plan.pago_adicional.indemnizacion}', 
+                        '${plan.pago_adicional.aguinaldo}', 
                         '${plan.monto_pago_adicional}',
                         '${plan.observacion1.id}',
                         '${plan.observacion2.id}',
-                        '${plan.empleado.fecha_ingreso}')">Modificar</button>
+                        '${plan.empleado.fecha_ingreso}')">Agregar pago extra</button>
                     </td>
                 `;
                             tbody.appendChild(tr);

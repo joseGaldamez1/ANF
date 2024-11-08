@@ -6,6 +6,7 @@ use App\Mail\CorreoReporte;
 use App\Models\Empleados;
 use App\Models\PagoAdicional;
 use App\Models\Planilla;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Exception;
@@ -95,6 +96,40 @@ class PlanillaController extends Controller
 
         foreach ($empleados as $empleado) {
 
+            //Calcular el aguinaldo para cada empleado
+            $aguinaldo = 0;
+            $fecha = $empleado->fecha_ingreso;
+            $fechaIngreso = Carbon::createFromFormat('Y-m-d', $fecha);
+            $salario = $empleado->salario;
+            $fechaFin  = Carbon::createFromFormat('Y-m-d', '2024-12-12');
+
+            //años trabajados
+            $aniosTrabajados = $fechaIngreso->diffInYears($fechaFin);
+
+            //dias trabajados si lleva menos de un año
+            $diasTrabajados = $fechaIngreso->diffInDays($fechaFin);
+
+            //Calcular el aguinaldo
+            if($aniosTrabajados < 1){
+                $diasAguinaldo = (15/365) * $diasTrabajados;
+            }elseif($aniosTrabajados >= 1 && $aniosTrabajados < 3){
+                $diasAguinaldo = 15;
+            }elseif($aniosTrabajados >= 3 && $aniosTrabajados <= 10){
+                $diasAguinaldo = 19;
+            }else{
+                $diasAguinaldo = 21;
+            }
+
+            $aguinaldo = $diasAguinaldo * ($salario/30);
+            Log::info('Aguinaldo: ' . $aguinaldo);
+            Log::info('Dias trabajados: ' . $diasTrabajados);
+            Log::info('Años trabajados: ' . $aniosTrabajados);
+            Log::info('Dias de aguinaldo: ' . $diasAguinaldo);
+            Log::info('Salario: ' . $salario);
+
+           
+
+
             $pagaAdicional = PagoAdicional::create([
                 'periodo' => $periodo,
                 'cantidad_hora_diurna' => 0,
@@ -102,7 +137,7 @@ class PlanillaController extends Controller
                 'cantidad_hora_nocturna' => 0,
                 'monto_hora_nocturna' => 0,
                 'vacaciones' => 0,
-                'aguinaldo' => 0,
+                'aguinaldo' => $aguinaldo,
                 'empleado_id' => $empleado->id,
                 'indemnizacion' => 0,
             ]);
@@ -111,7 +146,7 @@ class PlanillaController extends Controller
                 'periodo' => $periodo,
                 'salario' => $empleado->salario,
                 'pago_adicional_id' => $pagaAdicional->id,
-                'monto_pago_adicional' => 0,
+                'monto_pago_adicional' => $pagaAdicional->aguinaldo,
                 'monto_vacaciones' => 0,
                 'dias' => 30,
                 'horas' => 176,
@@ -135,6 +170,39 @@ class PlanillaController extends Controller
         ]);
     }
 
+
+
+
+    function calcularAguinaldo($fechaIngreso, $salario)
+    {
+        // Calcular el salario diario
+        $salarioDiario = $salario / 30; 
+        // Obtener la fecha actual
+        $fechaActual = Carbon::now();
+        // Calcular los años de servicio
+        $aniosTrabajados = $fechaActual->diffInYears(Carbon::parse($fechaIngreso));
+        // Calcular los días trabajados en el año actual si el empleado lleva menos de un año
+        $diasTrabajados = $fechaActual->diffInDays(Carbon::parse($fechaIngreso));
+
+        // Determinar el número de días de aguinaldo según la antigüedad
+        if ($aniosTrabajados < 1) {
+            // Proporcional a los días trabajados en el año
+            $diasAguinaldo = (15 / 365) * $diasTrabajados;
+        } elseif ($aniosTrabajados >= 1 && $aniosTrabajados < 3) {
+            $diasAguinaldo = 15;
+        } elseif ($aniosTrabajados >= 3 && $aniosTrabajados <= 10) {
+            $diasAguinaldo = 19;
+        } else {
+            $diasAguinaldo = 21;
+        }
+
+        // Calcular el aguinaldo
+        $aguinaldo = $diasAguinaldo * $salarioDiario;
+
+        return $aguinaldo;
+    }
+
+
     /**
      * Store a newly created resource in storage.
      */
@@ -156,7 +224,7 @@ class PlanillaController extends Controller
 
         return response()->json([
             'message' => 'Planillas finalizadas',
-            'data' => $planillas, 
+            'data' => $planillas,
         ]);
     }
 
@@ -185,8 +253,6 @@ class PlanillaController extends Controller
             'cantidad_hora_nocturna' => 'required|numeric',
             'monto_hora_nocturna' => 'required|numeric',
             'vacaciones' => 'required|numeric',
-            'aguinaldo' => 'required|numeric',
-            'indemnizacion' => 'required|numeric',
             'observacion1_id' => 'required|numeric',
             'observacion2_id' => 'required|numeric',
         ]);
@@ -211,8 +277,10 @@ class PlanillaController extends Controller
                 'cantidad_hora_nocturna' => $request->cantidad_hora_nocturna,
                 'monto_hora_nocturna' => $request->monto_hora_nocturna,
                 'vacaciones' => $request->vacaciones,
-                'aguinaldo' => $request->aguinaldo,
-                'indemnizacion' => $request->indemnizacion,
+                'dias_incapacidad' => $request->dias_incapacidad,
+                'monto_incapacidad' => $request->monto_incapacidad,
+                'dias_permisos' => $request->dias_permisos,
+                'monto_permisos' => $request->monto_permisos,
             ]);
 
             // Actualizar el detalle de la planilla
@@ -221,7 +289,7 @@ class PlanillaController extends Controller
                 'monto_vacaciones' => $pagoAdicional->vacaciones,
                 'dias' => $request->dias,
                 'horas' => $request->horas,
-                'dias_vacaciones' => '15',
+                'dias_vacaciones' => $request->dias_vacaciones,
                 'observacion1_id' => $request->observacion1_id,
                 'observacion2_id' => $request->observacion2_id,
             ]);

@@ -30,7 +30,11 @@ class PagoAdicional extends Model
         'vacaciones',
         'aguinaldo',
         'empleado_id',
-        'indemnizacion'
+        'indemnizacion',
+        'dias_incapacidad',
+        'monto_incapacidad',
+        'dias_permisos',
+        'monto_permisos',
     ];
 
   

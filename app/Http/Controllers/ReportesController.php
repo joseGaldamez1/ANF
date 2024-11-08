@@ -50,7 +50,7 @@ class ReportesController extends Controller
             <th style="border: 1px solid black; font-size: 10px; width: 45px">Horas Diurnas</th>
             <th style="border: 1px solid black; width: 57px">Horas Nocturnas</th>
             <th style="border: 1px solid black; width: 45px">Vacaciones</th>
-            <th style="border: 1px solid black; width: 50px">Indemnizacion</th>
+         
             <th style="border: 1px solid black; width: 45px">Aguinaldo</th>
             <th style="border: 1px solid black; width: 50px">Total</th>
             <th style="border: 1px solid black; width: 45px">AFP Laboral</th>
@@ -86,7 +86,7 @@ class ReportesController extends Controller
             <td style="border: 1px dashed gray; text-align: center; width: 45px">$ ' . $plan->pagoAdicional->monto_hora_diurna . '</td>
             <td style="border: 1px dashed gray; text-align: center; width: 57px">$ ' . $plan->pagoAdicional->monto_hora_nocturna . '</td>
             <td style="border: 1px dashed gray; text-align: center; width: 45px">$ ' . $plan->pagoAdicional->vacaciones . '</td>
-            <td style="border: 1px dashed gray; text-align: center; width: 50px">$ ' . $plan->pagoAdicional->indemnizacion . '</td>
+            
             <td style="border: 1px dashed gray; text-align: center; width: 45px">$ ' . $plan->pagoAdicional->aguinaldo . '</td>
             <td style="border: 1px dashed gray; text-align: center; width: 50px">$ ' . number_format($total, 2) . '</td>
             <td style="border: 1px dashed gray; text-align: center; width: 45px">$ ' . number_format($total * 0.0725, 2) . '</td>
@@ -98,7 +98,7 @@ class ReportesController extends Controller
 
         $tablaPlanilla .= '
     <tr>
-        <td colspan="13" style=" border: 1px solid black; text-align: center; font-size: 10px; font-weight: bold; height: 23px">Total a Pagar</td>
+        <td colspan="12" style=" border: 1px solid black; text-align: center; font-size: 10px; font-weight: bold; height: 23px">Total a Pagar</td>
         <td colspan="1" style="border: 1px solid black; text-align: center; font-size: 10px; font-weight: bold;">$ ' . number_format($totalPlanilla, 2) . '</td>
     </tr>
     </tbody>
@@ -206,10 +206,7 @@ class ReportesController extends Controller
                 <td style="font-weight: bold; border: 1px dotted gray; height: 25px">Vacaciones:</td>
                 <td style="border: 1px dotted gray;">$ ' . $plan->pagoAdicional->vacaciones . '</td>
             </tr>
-            <tr>
-                <td style="font-weight: bold; border: 1px dotted gray; height: 25px">Indemnización:</td>
-                <td style="border: 1px dotted gray;">$ ' . $plan->pagoAdicional->indemnizacion . '</td>
-            </tr>
+         
             <tr>
                 <td style="font-weight: bold; border: 1px dotted gray; height: 25px">Aguinaldo:</td>
                 <td style="border: 1px dotted gray;">$ ' . $plan->pagoAdicional->aguinaldo . '</td>
