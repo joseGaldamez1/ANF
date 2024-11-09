@@ -96,6 +96,7 @@ class PlanillaController extends Controller
 
         foreach ($empleados as $empleado) {
 
+        if($periodo == '122024'){
             //Calcular el aguinaldo para cada empleado
             $aguinaldo = 0;
             $fecha = $empleado->fecha_ingreso;
@@ -121,11 +122,10 @@ class PlanillaController extends Controller
             }
 
             $aguinaldo = $diasAguinaldo * ($salario/30);
-            Log::info('Aguinaldo: ' . $aguinaldo);
-            Log::info('Dias trabajados: ' . $diasTrabajados);
-            Log::info('Años trabajados: ' . $aniosTrabajados);
-            Log::info('Dias de aguinaldo: ' . $diasAguinaldo);
-            Log::info('Salario: ' . $salario);
+        }else{
+            $aguinaldo = 0;
+        }
+
 
            
 
@@ -140,6 +140,10 @@ class PlanillaController extends Controller
                 'aguinaldo' => $aguinaldo,
                 'empleado_id' => $empleado->id,
                 'indemnizacion' => 0,
+                'dias_incapacidad' => 0,
+                'monto_incapacidad' => 0,
+                'dias_permisos' => 0,
+                'monto_permisos' => 0,
             ]);
 
             $planilla = Planilla::create([
@@ -173,36 +177,7 @@ class PlanillaController extends Controller
 
 
 
-    function calcularAguinaldo($fechaIngreso, $salario)
-    {
-        // Calcular el salario diario
-        $salarioDiario = $salario / 30; 
-        // Obtener la fecha actual
-        $fechaActual = Carbon::now();
-        // Calcular los años de servicio
-        $aniosTrabajados = $fechaActual->diffInYears(Carbon::parse($fechaIngreso));
-        // Calcular los días trabajados en el año actual si el empleado lleva menos de un año
-        $diasTrabajados = $fechaActual->diffInDays(Carbon::parse($fechaIngreso));
-
-        // Determinar el número de días de aguinaldo según la antigüedad
-        if ($aniosTrabajados < 1) {
-            // Proporcional a los días trabajados en el año
-            $diasAguinaldo = (15 / 365) * $diasTrabajados;
-        } elseif ($aniosTrabajados >= 1 && $aniosTrabajados < 3) {
-            $diasAguinaldo = 15;
-        } elseif ($aniosTrabajados >= 3 && $aniosTrabajados <= 10) {
-            $diasAguinaldo = 19;
-        } else {
-            $diasAguinaldo = 21;
-        }
-
-        // Calcular el aguinaldo
-        $aguinaldo = $diasAguinaldo * $salarioDiario;
-
-        return $aguinaldo;
-    }
-
-
+   
     /**
      * Store a newly created resource in storage.
      */
@@ -221,6 +196,9 @@ class PlanillaController extends Controller
             $planilla->estado = 'Finalizada';
             $planilla->save();
         }
+
+        //Enviar correos a los empleados
+        $this->sendEmail($planillas[0]->periodo);
 
         return response()->json([
             'message' => 'Planillas finalizadas',
@@ -287,8 +265,8 @@ class PlanillaController extends Controller
             $planilla->update([
                 'monto_pago_adicional' => $request->pago_adicional,
                 'monto_vacaciones' => $pagoAdicional->vacaciones,
-                'dias' => $request->dias,
-                'horas' => $request->horas,
+                'dias' => 30 - $pagoAdicional->dias_incapacidad - $pagoAdicional->dias_permisos,
+                'horas' => 176 + $pagoAdicional->cantidad_hora_diurna + $pagoAdicional->cantidad_hora_nocturna - ($pagoAdicional->dias_incapacidad * 8) - ($pagoAdicional->dias_permisos * 8),
                 'dias_vacaciones' => $request->dias_vacaciones,
                 'observacion1_id' => $request->observacion1_id,
                 'observacion2_id' => $request->observacion2_id,

@@ -47,8 +47,37 @@
 <section class="container fondoMenu">
     <!-- Contenido principal aquí -->
     <h1 style="text-align: center">Ayuda</h1>
-    <p>https://www.pisto.co/liquidacion-laboral-en-el-salvador/</p>
-    <p>https://www.toptrabajos.com/blog/sv/calcular-vacaciones-de-ley/?</p>
+    <img style="width: 10%; display: block; margin: 0 auto;" src="{{ asset('img/ayuda.png') }}" alt="logoEmpresa">
+    <p style="text-align: center; ">
+        En esta sección encontrará información útil para el uso del sistema de gestión de planillas.
+    </p><br>
+    <p style="text-align: center;">
+      <strong>¿Como calcular la Renta?</strong><br>
+    </p>
+    <p style="text-align: center; font-size: 13px">
+      Para el calculo del Impuesto de la renta se tienen 3 tramos de ingresos, los cuales se encuentran en la Ley de Impuesto sobre la Renta <br>
+    </p>
+    <img style="width: 45%; display: block; margin: 0 auto;" src="{{ asset('img/renta.png')}}" alt="tramoRenta">
+    <div style="text-align: center;">
+        <a href="https://elsalvador.eregulations.org/media/Ley%20de%20Impuesto%20sobre%20la%20Renta_1.pdf" target="_blank">Leer más aquí</a>
+    </div><br>
+    
+    <p style="text-align: center;">
+        <strong>¿Como calcular el aguinaldo?</strong><br>
+    </p>
+    <p style="text-align: center; font-size: 13px">
+        El aguinaldo es un beneficio que se otorga a los empleados en el mes de diciembre, el cual se calcula de la siguiente manera:<br>
+        <ol style="font-size: 13px; text-align: center">
+            <li>- Si el empleado ha trabajado menos de un año, se le otorga un salario proporcional a los días trabajados.</li>
+            <li>- Si el empleado ha trabajado todo el año, se le otorga un salario equivalente a 15 días de trabajo.</li>
+            <li>- Si el empleado lleva entre 3 y años, se le otorga el salario equivalente a 19 dias de trabajo</li>
+            <li> - Si el empleado lleva mas de 10 años, se le otorga el salario equivalente a 21 dias de trabjo</li>
+        </ol>
+        <div style="text-align: center;">
+            <a href="https://ormusa.org/wp-content/uploads/2019/10/C%C3%93DIGO-DE-TRABAJO..pdf" target="_blank">Leer más aquí</a>
+        </div><br>
+    </p>    
+
 </section>
 
 </body>

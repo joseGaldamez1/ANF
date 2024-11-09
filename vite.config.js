@@ -9,6 +9,7 @@ export default defineConfig({
                 'resources/css/custom/login.css', 
                 'resources/css/custom/menu.css', 
                 'resources/css/custom/tablas.css',
+                'resources/css/custom/editarPlanilla.css',
                 'resources/js/app.js'
             ],
             refresh: true,

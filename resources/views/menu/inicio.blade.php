@@ -46,8 +46,14 @@
 
 <section class="container fondoMenu">
     <!-- Contenido principal aquí -->
-    <h1 style="text-align: center">Bienvenido al sistema de Gestion de Planillas</h1>
-</section>
+    <h1 style="text-align: center">Sistema de Gestion de Planillas</h1>
+    <img style="width: 60%; display: block; margin: 0 auto;" src="{{ asset('img/AF.png') }}" alt="logoEmpresa">
+    <p style="text-align: center; margin: 10%; margin-top: 5px">
+        Estimado/a administrador/a, de Recursos Humanos, le damos la bienvenida al sistema de gestión de planillas.
+        En este sistema podrá gestionar los puestos de trabajo, empleados, planilla y reportes de su empresa.
+    </p>
+
+
 
 </body>
 </html>

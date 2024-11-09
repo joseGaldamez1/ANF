@@ -46,6 +46,7 @@
 ?>
 <section class="container fondoMenu">
     <!-- Contenido principal aquí -->
+    <img style="width: 90%; display: block; margin: 0 auto;" src="{{ asset('img/AF.png') }}" alt="logoEmpresa">
 </section>
 
 

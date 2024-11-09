@@ -16,17 +16,14 @@ class ReportesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-       
-    }
+    public function index() {}
 
     public function planillaPDF(string $periodo)
     {
         $planilla = Planilla::with('pagoAdicional', 'observacion1', 'observacion2', 'empleado', 'empleador')
-        ->where('periodo', $periodo)
-        ->where('estado', 'Finalizada')
-        ->get();
+            ->where('periodo', $periodo)
+            ->where('estado', 'Finalizada')
+            ->get();
         $pdf = new \TCPDF();
         $pdf->AddPage();
         $pdf->setPageOrientation('L');
@@ -50,8 +47,8 @@ class ReportesController extends Controller
             <th style="border: 1px solid black; font-size: 10px; width: 45px">Horas Diurnas</th>
             <th style="border: 1px solid black; width: 57px">Horas Nocturnas</th>
             <th style="border: 1px solid black; width: 45px">Vacaciones</th>
-         
             <th style="border: 1px solid black; width: 45px">Aguinaldo</th>
+            <th style="border: 1px solid black; width: 50px">Descuentos</th>
             <th style="border: 1px solid black; width: 50px">Total</th>
             <th style="border: 1px solid black; width: 45px">AFP Laboral</th>
             <th style="border: 1px solid black; width: 40px">ISSS Laboral</th>
@@ -71,11 +68,12 @@ class ReportesController extends Controller
                     <td colspan="14" style="border: 1px dashed gray; text-align: center;">No hay datos disponibles.</td>
                 </tr>';
         }
-        
+
         foreach ($planilla as $plan) {
             $total = $plan->salario + $plan->pagoAdicional->monto_hora_diurna + $plan->pagoAdicional->monto_hora_nocturna + $plan->pagoAdicional->vacaciones + $plan->pagoAdicional->indemnizacion + $plan->pagoAdicional->aguinaldo;
-            $renta = $this->calcularRenta($total);
-            $totalPagar = $total - ($total * 0.0725) - (($total > 1000) ? 30  : $total * 0.03) - $renta;
+            $totalconDescuentos = $total - $plan->pagoAdicional->monto_incapacidad - $plan->pagoAdicional->monto_permisos;
+            $renta = $this->calcularRenta($totalconDescuentos);
+            $totalPagar = $total - ($total * 0.0725) - (($total > 1000) ? 30  : $total * 0.03) - $renta - $plan->pagoAdicional->monto_incapacidad - $plan->pagoAdicional->monto_permisos;
             $totalPlanilla += $totalPagar;
             $tablaPlanilla .= '
         <tr style="font-size: 9px; border: 1px dotted black">
@@ -86,11 +84,11 @@ class ReportesController extends Controller
             <td style="border: 1px dashed gray; text-align: center; width: 45px">$ ' . $plan->pagoAdicional->monto_hora_diurna . '</td>
             <td style="border: 1px dashed gray; text-align: center; width: 57px">$ ' . $plan->pagoAdicional->monto_hora_nocturna . '</td>
             <td style="border: 1px dashed gray; text-align: center; width: 45px">$ ' . $plan->pagoAdicional->vacaciones . '</td>
-            
             <td style="border: 1px dashed gray; text-align: center; width: 45px">$ ' . $plan->pagoAdicional->aguinaldo . '</td>
-            <td style="border: 1px dashed gray; text-align: center; width: 50px">$ ' . number_format($total, 2) . '</td>
-            <td style="border: 1px dashed gray; text-align: center; width: 45px">$ ' . number_format($total * 0.0725, 2) . '</td>
-            <td style="border: 1px dashed gray; text-align: center; width: 40px">$ ' . (($total > 1000) ? '30.00' : number_format($total * 0.03, 2)) . '</td>
+            <td style="border: 1px dashed gray; text-align: center; width: 50px">$ ' . $plan->pagoAdicional->monto_incapacidad + $plan->pagoAdicional->monto_permisos . '</td>
+            <td style="border: 1px dashed gray; text-align: center; width: 50px">$ ' . number_format($totalconDescuentos, 2) . '</td>
+            <td style="border: 1px dashed gray; text-align: center; width: 45px">$ ' . number_format($totalconDescuentos * 0.0725, 2) . '</td>
+            <td style="border: 1px dashed gray; text-align: center; width: 40px">$ ' . (($totalconDescuentos > 1000) ? '30.00' : number_format($totalconDescuentos * 0.03, 2)) . '</td>
             <td style="border: 1px dashed gray; text-align: center; width: 50px">' . number_format($renta, 2) . '</td>
             <td style="border: 1px dashed gray; text-align: center; width: 60px">$ ' . number_format($totalPagar, 2) . '</td>
         </tr>';
@@ -98,7 +96,7 @@ class ReportesController extends Controller
 
         $tablaPlanilla .= '
     <tr>
-        <td colspan="12" style=" border: 1px solid black; text-align: center; font-size: 10px; font-weight: bold; height: 23px">Total a Pagar</td>
+        <td colspan="13" style=" border: 1px solid black; text-align: center; font-size: 10px; font-weight: bold; height: 23px">Total a Pagar</td>
         <td colspan="1" style="border: 1px solid black; text-align: center; font-size: 10px; font-weight: bold;">$ ' . number_format($totalPlanilla, 2) . '</td>
     </tr>
     </tbody>
@@ -149,12 +147,12 @@ class ReportesController extends Controller
     {
 
         $planilla = Planilla::with('pagoAdicional', 'observacion1', 'observacion2', 'empleado', 'empleador')
-        ->where('periodo', $periodo)
-        ->where('empleado_id', $id)
-        ->where('estado', 'Finalizada')
-        ->get();
+            ->where('periodo', $periodo)
+            ->where('empleado_id', $id)
+            ->where('estado', 'Finalizada')
+            ->get();
 
-        if($planilla->isEmpty()){
+        if ($planilla->isEmpty()) {
             return response()->json([
                 'message' => 'No se encontró registro'
             ]);
@@ -176,8 +174,14 @@ class ReportesController extends Controller
         foreach ($planilla as $plan) {
 
             $total = $plan->salario + $plan->pagoAdicional->monto_hora_diurna + $plan->pagoAdicional->monto_hora_nocturna + $plan->pagoAdicional->vacaciones + $plan->pagoAdicional->indemnizacion + $plan->pagoAdicional->aguinaldo;
-            $renta = $this->calcularRenta($total);
-            $totalPagar = $total - ($total * 0.0725) - (($total > 1000) ? 30  : $total * 0.03) - $renta;
+            $renta = $this->calcularRenta($total - $plan->pagoAdicional->monto_incapacidad - $plan->pagoAdicional->monto_permisos);
+            $totalPagar = $total - ($total * 0.0725) - (($total > 1000) ? 30  : $total * 0.03) - $renta - $plan->pagoAdicional->monto_incapacidad - $plan->pagoAdicional->monto_permisos;
+
+            $montoIncapacidad = $plan->pagoAdicional->monto_incapacidad;
+            $montoPermisos = $plan->pagoAdicional->monto_permisos;
+            $totalMensual = $total - $montoIncapacidad - $montoPermisos;
+            $afpLaboral = number_format($totalMensual * 0.0725, 2);
+            $isssLaboral = ($totalMensual > 1000) ? '30.00' : number_format($totalMensual * 0.03, 2);
 
             $html = '
             <h3 style="text-align: left;">Información del Empleado</h3>
@@ -206,23 +210,30 @@ class ReportesController extends Controller
                 <td style="font-weight: bold; border: 1px dotted gray; height: 25px">Vacaciones:</td>
                 <td style="border: 1px dotted gray;">$ ' . $plan->pagoAdicional->vacaciones . '</td>
             </tr>
-         
             <tr>
                 <td style="font-weight: bold; border: 1px dotted gray; height: 25px">Aguinaldo:</td>
                 <td style="border: 1px dotted gray;">$ ' . $plan->pagoAdicional->aguinaldo . '</td>
             </tr>
-            <tr>
-                <td style="font-weight: bold; border: 1px dotted gray; height: 25px">Total mensual:</td>
-                <td style="border: 1px dotted gray;">$ ' . number_format($total, 2) . '</td>
-            </tr>
-            <tr>
-                <td style="font-weight: bold; border: 1px dotted gray; height: 25px">AFP Laboral:</td>
-                <td style="border: 1px dotted gray;">$ ' . number_format($total * 0.0725, 2) . '</td>
-            </tr>
-            <tr>
-                <td style="font-weight: bold; border: 1px dotted gray; height: 25px">ISSS Laboral:</td>
-                <td style="border: 1px dotted gray;">$ ' . (($total > 1000) ? '30.00' : number_format($total * 0.03, 2)) . '</td>
-            </tr>
+           <tr>
+        <td style="font-weight: bold; border: 1px dotted gray; height: 25px">Descuentos por incapacidad:</td>
+        <td style="border: 1px dotted gray;">$ (' . $montoIncapacidad . ')</td>
+    </tr>
+    <tr>
+        <td style="font-weight: bold; border: 1px dotted gray; height: 25px">Descuentos por permisos:</td>
+        <td style="border: 1px dotted gray;">$ (' . $montoPermisos . ')</td>
+    </tr>
+    <tr>
+        <td style="font-weight: bold; border: 1px dotted gray; height: 25px">Total mensual:</td>
+        <td style="border: 1px dotted gray;">$ ' . number_format($totalMensual, 2) . '</td>
+    </tr>
+    <tr>
+        <td style="font-weight: bold; border: 1px dotted gray; height: 25px">AFP Laboral:</td>
+        <td style="border: 1px dotted gray;">$ ' . $afpLaboral . '</td>
+    </tr>
+    <tr>
+        <td style="font-weight: bold; border: 1px dotted gray; height: 25px">ISSS Laboral:</td>
+        <td style="border: 1px dotted gray;">$ ' . $isssLaboral . '</td>
+    </tr>
             <tr>
                 <td style="font-weight: bold; border: 1px dotted gray; height: 25px">Renta:</td>
                 <td style="border: 1px dotted gray;">$ ' . number_format($renta, 2) . '</td>
@@ -254,11 +265,11 @@ class ReportesController extends Controller
     public function planillaExcel($periodo)
     {
         $planilla = Planilla::with('pagoAdicional', 'observacion1', 'observacion2', 'empleado', 'empleador')
-        ->where('periodo', $periodo)
-        ->where('estado', 'Finalizada')        
-        ->get();
+            ->where('periodo', $periodo)
+            ->where('estado', 'Finalizada')
+            ->get();
 
-        if($planilla->isEmpty()){
+        if ($planilla->isEmpty()) {
             return response()->json([
                 'message' => 'No se encontró registro'
             ]);
@@ -266,10 +277,10 @@ class ReportesController extends Controller
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        
+
         // Data
         $data = [];
-  
+
         // Llenar datos
         foreach ($planilla as $plan) {
             $data[] = [
@@ -286,7 +297,7 @@ class ReportesController extends Controller
                 $plan->empleado->apellido1,                       // Primer Apellido
                 $plan->empleado->apellido2,                       // Segundo Apellido
                 $plan->empleado->apellido_casada,                 // Apellido de Casada
-                $plan->salario,                                   // Salario
+                $plan->salario - $plan->pagoAdicional->monto_incapacidad - $plan->pagoAdicional->monto_permisos,                                   // Salario
                 $plan->monto_pago_adicional,                      // Pago Adicional
                 $plan->monto_vacaciones,                          // Monto de Vacacion
                 str_pad($plan->dias, 2, '0', STR_PAD_LEFT),   // Dias
@@ -296,7 +307,7 @@ class ReportesController extends Controller
                 $plan->observacion2->codigo === '01' ? '00' : $plan->observacion2->codigo      // Codigo de Observacion 2
             ];
         }
-        
+
         $sheet->fromArray($data, null, 'A1');
 
         $fileName = 'Planilla - ' . $periodo . '.csv';
@@ -308,11 +319,11 @@ class ReportesController extends Controller
         $writer->setLineEnding("\r\n");
 
         // Configurar la respuesta como descarga
-        $response = Response::streamDownload(function() use ($writer) {
+        $response = Response::streamDownload(function () use ($writer) {
             $writer->save('php://output');
         }, $fileName);
 
-       
+
 
         $response->headers->set('Content-Type', 'text/csv');
         $response->headers->set('Content-Disposition', "attachment; filename=\"$fileName\"");
